@@ -21,7 +21,7 @@ class SegmentService {
   val service = new JobService
   val pubService = new PublisherService
   val groupService = new JobGroupService
-
+def startSegment()={
   val client = Client("1","name","https://job-feeds-devlocal.s3.amazonaws.com/10-jobs.json",List())
 
   val publisher1 = Publisher("1",true,"",List())
@@ -101,11 +101,13 @@ class SegmentService {
   def getPub(pId:String):Future[Option[Publisher]] ={
     pubService.getPub(pId)
   }
-  publishers.foreach(p=>{
-    val maybePub:Future[Option[Publisher]]= getPub(p.id)
-    maybePub.onComplete {
-      case Success(p) => println(p.get.id + ":" + p.get.jobs)
-      case Failure(t) => println(maybePub)
-    }
-  })
+//  publishers.map(p=>{
+//    val maybePub:Future[Option[Publisher]]= getPub(p.id)
+//    maybePub.onComplete {
+//      case Success(p) => println(p.get.id + ":" + p.get.jobs)
+//      case Failure(t) => println(maybePub)
+//    }
+//  })
+  pubService.getPublishers()
+}
 }

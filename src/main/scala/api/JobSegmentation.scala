@@ -6,6 +6,7 @@ import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.stream.ActorMaterializer
+import org.json4s.native.Json
 import service.SegmentService
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -23,13 +24,15 @@ class JobSegmentation {
   implicit val serialization = Serialization
   implicit val formats = DefaultFormats
 
+  val segmentService = new SegmentService
   def showSegmentedJobs()={
     Future(new SegmentService)
 
   }
-  val routes:Route = concat(pathPrefix("seg"){
-    onComplete(showSegmentedJobs()){
-      case Success(seg) => complete("done")
+  val routes:Route = concat(pathPrefix("segment"){
+    val mayBeAns = segmentService.startSegment()
+    onComplete(mayBeAns){
+      case Success(list) => complete(list.map(pub => pub.id -> pub.jobs ))
       case Failure(exception) => {
         complete(StatusCodes.NotFound)
       }
